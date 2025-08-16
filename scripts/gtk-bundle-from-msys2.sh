@@ -206,16 +206,16 @@ extract_packages() {
 
 move_extracted_files() {
 	echo "Move extracted data to destination directory"
-	if [ -d mingw64 ]; then
+	if [ -d ucrt64 ]; then
 		for d in bin etc home include lib locale share var; do
-			if [ -d "mingw64/$d" ]; then
+			if [ -d "ucrt64/$d" ]; then
 				rm -rf $d
 				# prevent sporadic 'permission denied' errors on my system, not sure why they happen
 				sleep 0.5
-				mv mingw64/$d .
+				mv ucrt64/$d .
 			fi
 		done
-		rmdir mingw64
+		rmdir ucrt64
 	fi
 }
 
