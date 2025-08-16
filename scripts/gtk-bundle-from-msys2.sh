@@ -6,7 +6,7 @@
 # To be run within a MSYS2 shell. The extracted files will be
 # placed into the current directory.
 
-ABI=x86_64  # do not change, i686 is not supported any longer
+ABI="ucrt-x86_64"  # do not change, i686 is not supported any longer
 use_cache="no"
 make_zip="no"
 gtkv="3"
@@ -20,7 +20,7 @@ GTK_THEME_URL="https://github.com/geany/geany-osx/archive/refs/heads/master.zip"
 # Wine commands for 32bit and 64bit binaries (we still need 32bit for UnxUtils sort.exe)
 # Used only when "-x" is set
 EXE_WRAPPER_32="mingw-w64-i686-wine"
-EXE_WRAPPER_64="mingw-w64-x86_64-wine"
+EXE_WRAPPER_64="mingw-w64-ucrt-x86_64-wine"
 
 package_urls=""
 gtk3_dependency_pkgs=""
@@ -145,7 +145,7 @@ _getpkg() {
 	if [ "$use_cache" = "yes" ]; then
 		package_info=$(pacman -Qi mingw-w64-$ABI-$1)
 		package_version=$(echo "$package_info" | grep "^Version " | cut -d':' -f 2 | tr -d '[[:space:]]')
-		# use @(gz|xz|zst) to filter out signature files (e.g. mingw-w64-x86_64-...-any.pkg.tar.zst.sig)
+		# use @(gz|xz|zst) to filter out signature files (e.g. mingw-w64-ucrt-x86_64-...-any.pkg.tar.zst.sig)
 		ls $cachedir/mingw-w64-${ABI}-${1}-${package_version}-*.tar.@(gz|xz|zst) | sort -V | tail -n 1
 	else
 		case "$1" in
