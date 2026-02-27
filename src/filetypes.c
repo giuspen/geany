@@ -214,6 +214,7 @@ static void init_builtin_filetypes(void)
 	FT_INIT( DART,         NONE,         "Dart",             NULL                      );
 	FT_INIT( NIX,          NONE,         "Nix",              NULL                      );
 	FT_INIT( TOML,         CONF,         "TOML",             NULL                      );
+	FT_INIT( SINEX,        SINEX,        "SINEX",            NULL                      );
 }
 
 
@@ -647,6 +648,13 @@ static GeanyFiletype *find_shebang(const gchar *utf8_filename, const gchar *line
 			{ "sh",		GEANY_FILETYPES_SH },
 			{ "bash",	GEANY_FILETYPES_SH },
 			{ "dash",	GEANY_FILETYPES_SH },
+			{ "zsh",	GEANY_FILETYPES_SH },
+			{ "fish",	GEANY_FILETYPES_SH },
+			{ "ksh",	GEANY_FILETYPES_SH },
+			{ "mksh",	GEANY_FILETYPES_SH },
+			{ "csh",	GEANY_FILETYPES_SH },
+			{ "tcsh",	GEANY_FILETYPES_SH },
+			{ "ash",	GEANY_FILETYPES_SH },
 			{ "raku",	GEANY_FILETYPES_RAKU },
 			{ "perl6",	GEANY_FILETYPES_RAKU },
 			{ "perl",	GEANY_FILETYPES_PERL },
@@ -655,12 +663,6 @@ static GeanyFiletype *find_shebang(const gchar *utf8_filename, const gchar *line
 			{ "ruby",	GEANY_FILETYPES_RUBY },
 			{ "tcl",	GEANY_FILETYPES_TCL },
 			{ "make",	GEANY_FILETYPES_MAKE },
-			{ "zsh",	GEANY_FILETYPES_SH },
-			{ "ksh",	GEANY_FILETYPES_SH },
-			{ "mksh",	GEANY_FILETYPES_SH },
-			{ "csh",	GEANY_FILETYPES_SH },
-			{ "tcsh",	GEANY_FILETYPES_SH },
-			{ "ash",	GEANY_FILETYPES_SH },
 			{ "dmd",	GEANY_FILETYPES_D },
 			{ "wish",	GEANY_FILETYPES_TCL },
 			{ "node",	GEANY_FILETYPES_JS },
@@ -688,22 +690,22 @@ static GeanyFiletype *find_shebang(const gchar *utf8_filename, const gchar *line
 		g_free(tmp);
 	}
 	/* detect HTML files */
-	if (g_str_has_prefix(line, "<!DOCTYPE html") || g_str_has_prefix(line, "<html"))
+	else if (g_str_has_prefix(line, "<!DOCTYPE html") || g_str_has_prefix(line, "<html"))
 	{
 		/* PHP, Perl and Python files might also start with <html, so detect them based on filename
 		 * extension and use the detected filetype, else assume HTML */
-		if (! shebang_find_and_match_filetype(utf8_filename,
+		if (! utf8_filename || ! shebang_find_and_match_filetype(utf8_filename,
 				GEANY_FILETYPES_PERL, GEANY_FILETYPES_PHP, GEANY_FILETYPES_PYTHON, -1))
 		{
 			ft = filetypes[GEANY_FILETYPES_HTML];
 		}
 	}
 	/* detect XML files */
-	else if (utf8_filename && g_str_has_prefix(line, "<?xml"))
+	else if (g_str_has_prefix(line, "<?xml"))
 	{
 		/* HTML and DocBook files might also start with <?xml, so detect them based on filename
 		 * extension and use the detected filetype, else assume XML */
-		if (! shebang_find_and_match_filetype(utf8_filename,
+		if (! utf8_filename || ! shebang_find_and_match_filetype(utf8_filename,
 				GEANY_FILETYPES_HTML, GEANY_FILETYPES_DOCBOOK,
 				/* Perl, Python and PHP only to be safe */
 				GEANY_FILETYPES_PERL, GEANY_FILETYPES_PHP, GEANY_FILETYPES_PYTHON, -1))

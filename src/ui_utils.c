@@ -93,7 +93,6 @@ static struct
 	GtkWidget	*redo_items[3];
 	GtkWidget	*undo_items[3];
 	GtkWidget	*save_buttons[4];
-	GtkWidget	*config_files_menu;
 }
 widgets;
 
@@ -1002,6 +1001,22 @@ void ui_sidebar_show_hide(void)
 	}
 
 	ui_widget_show_hide(main_widgets.sidebar_notebook, ui_prefs.sidebar_visible);
+	if (ui_prefs.sidebar_visible)
+	{
+		/* When sidebar has the size <10px, re-show it with rougly the default
+		 * size. This prevents the situation when the separator is too close
+		 * to the window edge and hard to grab/notice. */
+		GtkPaned *hpaned = GTK_PANED(ui_lookup_widget(main_widgets.window, "hpaned1"));
+		GtkAllocation allocation;
+
+		gtk_widget_get_allocation(GTK_WIDGET(hpaned), &allocation);
+
+		if (interface_prefs.sidebar_pos == GTK_POS_LEFT && gtk_paned_get_position(hpaned) < 10)
+			gtk_paned_set_position(hpaned, 300);
+		else if (interface_prefs.sidebar_pos == GTK_POS_RIGHT &&
+				allocation.width - gtk_paned_get_position(hpaned) < 10)
+			gtk_paned_set_position(hpaned, allocation.width - 300);
+	}
 
 	ui_widget_show_hide(gtk_notebook_get_nth_page(
 		GTK_NOTEBOOK(main_widgets.sidebar_notebook), 0), interface_prefs.sidebar_symbol_visible);
@@ -1017,7 +1032,7 @@ void ui_menubar_show_hide(gboolean show)
 	GtkWidget *editor_separator_item = ui_lookup_widget(main_widgets.editor_menu, "show_menubar_separator1");
 	GtkWidget *editor_show_menubar_item = ui_lookup_widget(main_widgets.editor_menu, "show_menubar1");
 	GeanyKeyGroup *group = keybindings_get_core_group(GEANY_KEY_GROUP_VIEW);
-	GeanyKeyBinding *kb = keybindings_get_item(group, GEANY_KEYS_TOGGLE_MENUBAR);
+	GeanyKeyBinding *kb = keybindings_get_item(group, GEANY_KEYS_VIEW_TOGGLE_MENUBAR);
 
 	if (!show && kb->key == 0)
 		return;  /* don't allow hiding menubar when no keybinding set */
@@ -2172,13 +2187,13 @@ void ui_add_config_file_menu_item(const gchar *real_path, const gchar *label, Gt
 	GtkWidget *item;
 
 	if (!parent)
-		parent = GTK_CONTAINER(widgets.config_files_menu);
+		parent = GTK_CONTAINER(ui_widgets.config_files_menu);
 
 	if (!label)
 	{
 		gchar *base_name;
 
-		base_name = g_path_get_basename(real_path);
+		base_name = g_filename_display_basename(real_path);
 		item = gtk_menu_item_new_with_label(base_name);
 		g_free(base_name);
 	}
@@ -2203,7 +2218,7 @@ static void create_config_files_menu(void)
 {
 	GtkWidget *menu, *item;
 
-	widgets.config_files_menu = menu = gtk_menu_new();
+	ui_widgets.config_files_menu = menu = gtk_menu_new();
 
 	item = ui_lookup_widget(main_widgets.window, "configuration_files1");
 	gtk_menu_item_set_submenu(GTK_MENU_ITEM(item), menu);
@@ -2215,7 +2230,7 @@ static void create_config_files_menu(void)
 	gtk_widget_show(item);
 
 	/* sort menu after all items added */
-	g_idle_add(sort_menu, widgets.config_files_menu);
+	g_idle_add(sort_menu, ui_widgets.config_files_menu);
 }
 
 

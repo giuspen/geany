@@ -1052,6 +1052,7 @@ void highlighting_init_styles(guint filetype_idx, GKeyFile *config, GKeyFile *co
 		init_styleset_case(RUBY);
 		init_styleset_case(RUST);
 		init_styleset_case(SH);
+		init_styleset_case(SINEX);
 		init_styleset_case(SMALLTALK);
 		init_styleset_case(SQL);
 		init_styleset_case(TCL);
@@ -1152,6 +1153,7 @@ void highlighting_set_styles(ScintillaObject *sci, GeanyFiletype *ft)
 		styleset_case(RUBY);
 		styleset_case(RUST);
 		styleset_case(SH);
+		styleset_case(SINEX);
 		styleset_case(SMALLTALK);
 		styleset_case(SQL);
 		styleset_case(TCL);
@@ -1345,6 +1347,20 @@ static void on_color_scheme_dialog_response(GtkWidget *dialog,
 }
 
 
+static gboolean color_scheme_search_equal_func(GtkTreeModel *model,
+	gint column, const gchar *key, GtkTreeIter *iter, gpointer data)
+{
+	gchar *desc;
+	gboolean match;
+
+	gtk_tree_model_get(model, iter, SCHEME_MARKUP, &desc, -1);
+	match = utils_utf8_substring_match(key, desc);
+	g_free(desc);
+
+	return ! match;
+}
+
+
 void highlighting_show_color_scheme_dialog(void)
 {
 	static GtkWidget *dialog = NULL;
@@ -1368,6 +1384,8 @@ void highlighting_show_color_scheme_dialog(void)
 	g_object_unref(store);
 	gtk_tree_view_set_rules_hint(GTK_TREE_VIEW(tree), TRUE);
 	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(tree), FALSE);
+	gtk_tree_view_set_search_equal_func(GTK_TREE_VIEW(tree),
+		color_scheme_search_equal_func, NULL, NULL);
 
 	text_renderer = gtk_cell_renderer_text_new();
 	g_object_set(text_renderer, "wrap-mode", PANGO_WRAP_WORD, NULL);
@@ -1998,6 +2016,9 @@ gboolean highlighting_is_comment_style(gint lexer, gint style)
 
 		case SCLEX_TOML:
 			return (style == SCE_TOML_COMMENT);
+
+		case SCLEX_SINEX:
+			return (style == SCE_SINEX_COMMENTLINE);
 	}
 	return FALSE;
 }

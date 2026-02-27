@@ -457,10 +457,13 @@ void on_entry_tagfilter_changed(GtkAction *action, gpointer user_data)
 }
 
 
-void on_entry_tagfilter_icon_press(GtkEntry *entry, GtkEntryIconPosition icon_pos, GdkEvent *event, gpointer user_data)
+void on_entry_tagfilter_icon_release(GtkEntry *entry, GtkEntryIconPosition icon_pos, GdkEvent *event, gpointer user_data)
 {
 	if (event->button.button == 1)
+	{
 		gtk_entry_set_text(entry, "");
+		gtk_widget_grab_focus(GTK_WIDGET(entry));
+	}
 }
 
 
@@ -488,10 +491,13 @@ void on_entry_docfilter_changed(GtkAction *action, gpointer user_data)
 }
 
 
-void on_entry_docfilter_icon_press(GtkEntry *entry, GtkEntryIconPosition icon_pos, GdkEvent *event, gpointer user_data)
+void on_entry_docfilter_icon_release(GtkEntry *entry, GtkEntryIconPosition icon_pos, GdkEvent *event, gpointer user_data)
 {
 	if (event->button.button == 1)
+	{
 		gtk_entry_set_text(entry, "");
+		gtk_widget_grab_focus(GTK_WIDGET(entry));
+	}
 }
 
 
@@ -2109,6 +2115,44 @@ static void builder_connect_func(GtkBuilder *builder, GObject *object,
 		g_signal_connect_data(object, signal_name, callback, NULL, NULL, flags);
 	else
 		g_signal_connect_object(object, signal_name, callback, connect_obj, flags);
+}
+
+
+/* When resized so it's less than 10px from the edge, hide the sidebar/message window */
+static void on_hpaned1_position_notify(GObject *object, GParamSpec *pspec, gpointer data)
+{
+	GtkPaned *hpaned = GTK_PANED(ui_lookup_widget(main_widgets.window, "hpaned1"));
+	GtkAllocation allocation;
+
+	gtk_widget_get_allocation(GTK_WIDGET(hpaned), &allocation);
+
+	if (interface_prefs.sidebar_pos == GTK_POS_LEFT && gtk_paned_get_position(hpaned) < 10)
+	{
+		ui_prefs.sidebar_visible = FALSE;
+		ui_sidebar_show_hide();
+	}
+	else if (interface_prefs.sidebar_pos == GTK_POS_RIGHT &&
+		allocation.width - gtk_paned_get_position(hpaned) < 10)
+	{
+		ui_prefs.sidebar_visible = FALSE;
+		ui_sidebar_show_hide();
+	}
+}
+
+
+static void on_vpaned1_position_notify(GObject *object, GParamSpec *pspec, gpointer data)
+{
+	GtkPaned *vpaned = GTK_PANED(ui_lookup_widget(main_widgets.window, "vpaned1"));
+	GtkAllocation allocation;
+
+	gtk_widget_get_allocation(GTK_WIDGET(vpaned), &allocation);
+
+	if (interface_prefs.msgwin_orientation == GTK_ORIENTATION_VERTICAL &&
+			allocation.height - gtk_paned_get_position(vpaned) < 10)
+		msgwin_show_hide(FALSE);
+	else if (interface_prefs.msgwin_orientation == GTK_ORIENTATION_HORIZONTAL &&
+			allocation.width - gtk_paned_get_position(vpaned) < 10)
+		msgwin_show_hide(FALSE);
 }
 
 

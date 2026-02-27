@@ -4982,9 +4982,6 @@ static ScintillaObject *create_new_sci(GeanyEditor *editor)
 	/* paste to all cursor positions, not just the primary one */
 	SSM(sci, SCI_SETMULTIPASTE, SC_MULTIPASTE_EACH, 0);
 
-	/* perform autocomplete for all cursor positions, not just the primary one */
-	SSM(sci, SCI_AUTOCSETMULTI, SC_MULTIAUTOC_EACH , 0);
-
 	/* only connect signals if this is for the document notebook, not split window */
 	if (editor->sci == NULL)
 	{
@@ -5188,6 +5185,7 @@ void editor_apply_update_prefs(GeanyEditor *editor)
 {
 	ScintillaObject *sci;
 	int caret_y_policy;
+	guint i, margin_count;
 
 	g_return_if_fail(editor != NULL);
 
@@ -5220,6 +5218,13 @@ void editor_apply_update_prefs(GeanyEditor *editor)
 	sci_set_eol_representation_characters(sci, sci_get_eol_mode(sci));
 
 	sci_set_folding_margin_visible(sci, editor_prefs.folding);
+
+	/* Override the default backwards cursor on margins with normal cursor */
+	margin_count = (guint) SSM(sci, SCI_GETMARGINS, 0, 0);
+	for (i = 0; i < margin_count; i++)
+	{
+		SSM(sci, SCI_SETMARGINCURSORN, i, SC_CURSORARROW);
+	}
 
 	/* virtual space */
 	SSM(sci, SCI_SETVIRTUALSPACEOPTIONS, editor_prefs.show_virtual_space, 0);

@@ -8374,11 +8374,13 @@ Supported placeholders are:
             <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="position">400</property>
+            <signal name="notify::position" handler="on_vpaned1_position_notify" swapped="no"/>
             <child>
               <object class="GtkHPaned" id="hpaned1">
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="position">167</property>
+                <signal name="notify::position" handler="on_hpaned1_position_notify" swapped="no"/>
                 <child>
                   <object class="GtkNotebook" id="notebook3">
                     <property name="visible">True</property>
@@ -8403,7 +8405,7 @@ Supported placeholders are:
                             <property name="primary-icon-activatable">False</property>
                             <signal name="activate" handler="on_entry_tagfilter_activate" swapped="no"/>
                             <signal name="changed" handler="on_entry_tagfilter_changed" swapped="no"/>
-                            <signal name="icon-press" handler="on_entry_tagfilter_icon_press" swapped="no"/>
+                            <signal name="icon-release" handler="on_entry_tagfilter_icon_release" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -8459,7 +8461,7 @@ Supported placeholders are:
                             <property name="primary-icon-activatable">False</property>
                             <signal name="activate" handler="on_entry_docfilter_activate" swapped="no"/>
                             <signal name="changed" handler="on_entry_docfilter_changed" swapped="no"/>
-                            <signal name="icon-press" handler="on_entry_docfilter_icon_press" swapped="no"/>
+                            <signal name="icon-release" handler="on_entry_docfilter_icon_release" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">False</property>
